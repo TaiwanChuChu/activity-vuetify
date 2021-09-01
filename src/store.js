@@ -13,10 +13,10 @@ const store = new Vuex.Store({
     setUser(state, payload) {
       state.user = payload
       // 取不到token直接設定
-      if(!localStorage.getItem('token')) {
+      if (!localStorage.getItem('token')) {
         localStorage.setItem('token', payload.access_token)
-      // 有取到token，但如果token不一樣就要重新設定，避免使用的是過期token
-      } else if(localStorage.getItem('token') && localStorage.getItem('token') != payload.access_token) {
+        // 有取到token，但如果token不一樣就要重新設定，避免使用的是過期token
+      } else if (localStorage.getItem('token') && localStorage.getItem('token') != payload.access_token) {
         localStorage.setItem('token', payload.access_token)
       }
     },
@@ -33,15 +33,15 @@ const store = new Vuex.Store({
   actions: {
     async login({ dispatch }, payload) {
       let data = await axios.post(process.env.VUE_APP_API_PATH + '/oauth/token', {
-          grant_type:'password',
-          client_id:'1',
-          client_secret:'R1S5SlZXTYjKREj8CiFvR3ZcTidBdgWoxSAVTmxM',
-          username: payload.account,
-          // username:'user_40170964',
-          password: payload.password,
-          // password:'password',
-          scope:'',
-        })
+        grant_type: 'password',
+        client_id: '3',
+        client_secret: process.env.VUE_APP_OAUTH_SECURITY_KEY,
+        username: payload.account,
+        // username:'user_40170964',
+        password: payload.password,
+        // password:'password',
+        scope: '',
+      })
         .then(response => {
           // console.log('login resolve----------------------------------')
           return response.data.access_token
@@ -51,21 +51,21 @@ const store = new Vuex.Store({
         })
       // console.log('data',data)
 
-        await dispatch('setUser', data)
+      await dispatch('setUser', data)
     },
 
     async setUser({ commit }, payload) {
-          console.log('setUser ------------------------')
+      console.log('setUser ------------------------')
 
-        // console.log('PAYLOAD',payload)
-        if(payload == null || payload == undefined) {
-          return false
+      // console.log('PAYLOAD',payload)
+      if (payload == null || payload == undefined) {
+        return false
+      }
+      await axios.get(process.env.VUE_APP_API_PATH + '/api/user', {
+        headers: {
+          'Authorization': `Bearer ${payload}`
         }
-        await axios.get(process.env.VUE_APP_API_PATH + '/api/user', {
-          headers: {
-            'Authorization': `Bearer ${payload}`
-          }
-        })
+      })
         .then(async response => {
           // console.log('setUser ------------------------')
           response.data.data[0]['access_token'] = payload
@@ -73,12 +73,12 @@ const store = new Vuex.Store({
           // console.log('huihihihihih', response.data.data)
           await commit('setUser', response.data.data[0])
         }).catch((err) => {
-          console.log('Vuex setUser ERR',err)
+          console.log('Vuex setUser ERR', err)
         })
     },
-    logOut ({ commit }, flag) {
+    logOut({ commit }, flag) {
       console.log('LOGOUT!!!', flag)
-      if(flag === false) return
+      if (flag === false) return
       axios.post(process.env.VUE_APP_API_PATH + '/api/user/logout', {}, {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('token'),
@@ -86,11 +86,11 @@ const store = new Vuex.Store({
       });
       localStorage.removeItem('token')
       commit('logOut')
-      router.push({name: 'login'}).then().catch(() => {})
+      router.push({ name: 'login' }).then().catch(() => { })
     },
     redirect({ state }) {
       // console.log('redirect----------------')
-      router.push({ name: 'Home', params: { userId: state.user.id }})
+      router.push({ name: 'Home', params: { userId: state.user.id } })
     },
     // async checkLogin(payload) {
     //   console.log('CHECK LOGIN')
