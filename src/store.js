@@ -68,9 +68,10 @@ const store = new Vuex.Store({
         })
         .then(async response => {
           // console.log('setUser ------------------------')
-          response.data.access_token = payload
+          response.data.data[0]['access_token'] = payload
           // console.log('setUser------------------resolve-------------', response)
-          await commit('setUser', response.data)
+          // console.log('huihihihihih', response.data.data)
+          await commit('setUser', response.data.data[0])
         }).catch((err) => {
           console.log('Vuex setUser ERR',err)
         })

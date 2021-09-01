@@ -8,7 +8,7 @@
                 <v-list>
                     <v-list-item class="px-2">
                         <v-list-item-avatar>
-                            <v-img src="https://randomuser.me/api/portraits/women/85.jpg"></v-img>
+                            <v-img :src="user.headshot[0]['url']"></v-img>
                         </v-list-item-avatar>
                     </v-list-item>
 
@@ -36,14 +36,10 @@
                 </v-list>
             </v-navigation-drawer>
 
-
             <keep-alive>
                 <component :is="currentTabComponent" class="ml-5"></component>
             </keep-alive>
-<!-- 
-        <user-info />
-        <user-applied />
-        <user-apply /> -->
+
         </div>
 </template>
 <script>

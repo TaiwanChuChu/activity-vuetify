@@ -10,6 +10,7 @@
             v-model="valid"
             lazy-validation
             class="mt-5"
+            enctype="multipart/form-data"
         >
           <v-text-field class="font-hk" label="使用者帳號" :value="account" readonly outlined />
           <v-btn class="blue lighten-3 mb-5 mt-n5" @click="changePwd">修改密碼</v-btn>
@@ -39,6 +40,14 @@
 
           <v-text-field class="font-hk" label="姓名" v-model="name" :rules="nameRules" outlined />
           <v-text-field class="font-hk" label="Email" v-model="email" :rules="emailRules" outlined />
+          <v-file-input
+            :rules="FileRules"
+            v-model="files"
+            accept="image/png, image/jpeg, image/bmp"
+            label="個人圖片上傳"
+            filled
+            prepend-icon="mdi-camera"
+          ></v-file-input>
           <v-btn @click="save" color="success">存檔</v-btn>
 
         </v-form>
@@ -83,6 +92,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+const fileExt = ['image/jpeg', 'image/jpg', 'image/png'];
 
 export default {
     data() {
@@ -109,6 +119,11 @@ export default {
             password2Rules: [
                 v => this.changePwdState === false || this.rules.required(v, '使用者密碼二次確認'),
                 v => v == this.password || '使用者密碼二次確認與使用者密碼不相同',
+            ],
+            files: [],
+            FileRules: [
+                v => v.length === 0 || v.size < 2000000 || '檔案大小超過 2MB!',
+                v => v.length === 0 || fileExt.includes(v.type) || `檔案格式只允許${fileExt.join(', ')}!`,
             ],
             show: false,
             show2: false,
@@ -145,26 +160,38 @@ export default {
             this.overlay = true
 
             if(this.$refs.form.validate()) {
+                let formData = new FormData()
+                
                 let putJson = {
+                    _method: 'PUT',
                     name: this.name,
                     email: this.email,
                     password: this.password,
+                    headshot: this.files,
                 }
 
                 for(let item in putJson) {
                     if(putJson[item] == null || putJson[item] == undefined || putJson[item] == '') {
                         delete putJson[item]
+                    } else {
+                        formData.append(item, putJson[item])
                     }
                 }
 
+                for (let pair of formData.entries()) {
+                    console.log(pair[0]+ ', ' + pair[1]); 
+                }
+
+
                 let putHeader = {
                     headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                        'Content-Type': 'multipart/form-data'
                     },
                 }
                 // console.log('SAVE!', this.name, this.email)
-                console.log(process.env.VUE_APP_API_PATH + '/api/user/' + this.$store.getters.user.id)
-                await this.axios.put(process.env.VUE_APP_API_PATH + '/api/user/' + this.$store.getters.user.id, putJson, putHeader).then(response => {
+                // console.log(process.env.VUE_APP_API_PATH + '/api/user/' + this.$store.getters.user.id)
+                await this.axios.post(process.env.VUE_APP_API_PATH + '/api/user/' + this.$store.getters.user.id, formData, putHeader).then(response => {
                     console.log('AXIOS', response)
                     this.$store.dispatch('setUser', localStorage.getItem('token'))
                 }).catch(error => {
@@ -175,6 +202,7 @@ export default {
                 this.overlay = false
                 this.password = this.password2 = null
                 this.changePwdState = false
+                this.files = null
             } else {
                 console.log('Error!')
                 this.overlay = false
