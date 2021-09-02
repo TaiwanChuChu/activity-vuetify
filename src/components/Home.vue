@@ -48,6 +48,47 @@
         <v-icon>mdi-chevron-right</v-icon>
       </v-btn>
     </v-sheet>
+     <v-menu
+          v-model="selectedOpen"
+          :close-on-content-click="false"
+          :activator="selectedElement"
+          offset-x
+        >
+          <v-card
+            color="grey lighten-4"
+            min-width="350px"
+            flat
+          >
+            <v-toolbar
+              :color="selectedEvent.color"
+              dark
+            >
+              <v-btn icon>
+                <v-icon>mdi-pencil</v-icon>
+              </v-btn>
+              <v-toolbar-title v-html="selectedEvent.name"></v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon>
+                <v-icon>mdi-heart</v-icon>
+              </v-btn>
+              <v-btn icon>
+                <v-icon>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </v-toolbar>
+            <v-card-text>
+              <span v-html="selectedEvent.details"></span>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn
+                text
+                color="secondary"
+                @click="selectedOpen = false"
+              >
+                Cancel
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
     <v-sheet height="600">
       <v-calendar
         ref="calendar"
@@ -60,7 +101,8 @@
         :event-color="getEventColor"
         @change="getEvents"
         @click:event="showEvent"
-        @click:more="test"
+        @click:more="viewDay"
+        @click:date="viewDay"
       ></v-calendar>
     </v-sheet>
   </div>
@@ -84,6 +126,9 @@ export default {
       events: [],
       colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
       names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
+      selectedOpen: false,
+      selectedElement: null,
+      selectedEvent: {},
     }),
     methods: {
       getEvents ({ start, end }) {
@@ -108,11 +153,11 @@ export default {
           // const second = new Date(first.getTime() + secondTimestamp)
 
           // const start = this.rnd(min.getTime(), max.getTime())
-          let start = new Date()
-          start = start.setDate(start.getDate() - 30)
+          let startD = new Date()
+          start = startD.setDate(startD.getDate())
 
-          let end = new Date()
-          end = end.setDate(end.getDate() - 20)
+          let endD = new Date()
+          end = endD.setDate(endD.getDate() + 20)
 
           events.push({
             name: this.names[this.rnd(0, this.names.length - 1)],
@@ -131,10 +176,12 @@ export default {
       rnd (a, b) {
         return Math.floor((b - a + 1) * Math.random()) + a
       },
-      test ({ date, year }) {
-        alert(date + '~' + year)
+      viewDay ({ date }) {
+        this.focus = date
+        this.type = 'day'
       },
       showEvent ({ nativeEvent, event }) {
+        console.log(nativeEvent, event)
         const open = () => {
           this.selectedEvent = event
           this.selectedElement = nativeEvent.target

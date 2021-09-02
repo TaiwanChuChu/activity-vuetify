@@ -4,7 +4,7 @@
       <v-list>
         <v-list-item class="px-2">
           <v-list-item-avatar>
-            <!-- <v-img :src="user.headshot[0]['url']"></v-img> -->
+            <v-img :src="user.headshot.length > 0 ? user.headshot[0]['url'] : null"></v-img>
           </v-list-item-avatar>
         </v-list-item>
 
