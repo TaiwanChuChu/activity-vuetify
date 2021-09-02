@@ -34,7 +34,7 @@ const store = new Vuex.Store({
     async login({ dispatch }, payload) {
       let data = await axios.post(process.env.VUE_APP_API_PATH + '/oauth/token', {
         grant_type: 'password',
-        client_id: '3',
+        client_id: `${process.env.VUE_APP_OAUTH_CLIENT_ID}`,
         client_secret: process.env.VUE_APP_OAUTH_SECURITY_KEY,
         username: payload.account,
         // username:'user_40170964',
