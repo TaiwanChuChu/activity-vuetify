@@ -105,8 +105,13 @@
       </div>
     </template>
 
-    <template v-for="item2 in headers" v-slot:[`item.${item2.value}`]="{ item }">
-        {{ trans(item, item2.value) }}
+    <template v-for="(item2, index) in headers" v-slot:[`item.${item2.value}`]="{ item }">
+        <v-btn :key="index" v-if="item2.value === 'id'" @click.stop="apply(item.id)" class="green lighten-1 white--text" :loading="btn_apply_loading">
+          我要報名
+        </v-btn>
+        <template v-if="item2.value !== 'id'">
+          {{ trans(item, item2.value) }}
+        </template>
     </template>
 
     <template v-slot:expanded-item="{ headers, item }">
@@ -140,7 +145,7 @@
         v-if="!!this.detail"
         v-slot:no-data
       >
-        沒有資料哦~
+        查無資料
       </template>
     </v-data-table>
     {{ options }}
@@ -187,6 +192,7 @@ export default {
             expanded: [],
             item_key: 'id',
             open_detail_icon: 'mdi-lock',
+            btn_apply_loading: false,
         }
     },
     methods: {
@@ -251,14 +257,32 @@ export default {
           .catch(err => console.log(err))
           this.tb_loading = false
         },
-      trans(obj, keys) {
-        let key = keys.split('.')
-        let tmpObj = obj
-        key.forEach(el => {
-          tmpObj = tmpObj[el]
-        })
-        return tmpObj
-      }
+        trans(obj, keys) {
+          let key = keys.split('.')
+          let tmpObj = obj
+          key.forEach(el => {
+            tmpObj = tmpObj[el]
+          })
+          return tmpObj
+        },
+        async apply(item) {
+          console.log('ITEM', item)
+          this.btn_apply_loading = true
+          await this.axios.post(process.env.VUE_APP_API_PATH + '/api/activity/ActivityApply', {
+            activity_id: item,
+          }, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          })
+            .then(response => {
+              console.log('huihihihihih', response)
+            }).catch((err) => {
+              console.log('Vuex setUser ERR', err)
+            })
+          this.filterSearch()
+          this.btn_apply_loading = false
+        }
     }
 }
 </script>

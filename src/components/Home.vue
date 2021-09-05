@@ -112,8 +112,8 @@
 export default {
     data: () => ({
       type: 'month',
-      types: ['month', 'week', 'day', '4day'],
-      mode: 'stack',
+      types: ['month', 'week', 'day'],
+      mode: 'column',
       modes: ['stack', 'column'],
       weekday: [0, 1, 2, 3, 4, 5, 6],
       weekdays: [
@@ -129,41 +129,53 @@ export default {
       selectedOpen: false,
       selectedElement: null,
       selectedEvent: {},
+      activityItem: [],
     }),
+    mounted() {
+      this.axios.get(process.env.VUE_APP_API_PATH + '/api/activity/ActivityApply', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+        .then(response => {
+          console.log('huihihihihih', response.data)
+          this.activityItem = response.data.data
+          const events = []
+
+          for (let i = 0; i < this.activityItem.length; i++) {
+            let activityBasic = this.activityItem[i]['activityBasics']
+            let startD = new Date(activityBasic['apply_sdate'])
+            let endD = new Date(activityBasic['apply_edate'])
+
+            events.push({
+              name: activityBasic['theme'],
+              start: startD.getTime(),
+              end: endD.getTime(),
+              color: 'green lighten-1',
+              timed: true,
+            })
+          }
+
+          this.events = events
+        }).catch((err) => {
+          console.log('Vuex setUser ERR', err)
+        })
+    },
     methods: {
       getEvents ({ start, end }) {
         console.log(start, end)
         const events = []
 
-        const min = new Date(`${start.date}T00:00:00`)
-        const max = new Date(`${end.date}T23:59:59`)
-        const days = (max.getTime() - min.getTime()) / 86400000
-        const eventCount = this.rnd(days, days + 20)
-
-        console.log('min', min);
-        console.log('max', max);
-        console.log('days', days);
-        console.log('eventCount', eventCount);
-
-        for (let i = 0; i < 5; i++) {
-          // const allDay = this.rnd(0, 3) === 0
-          // const firstTimestamp = this.rnd(min.getTime(), max.getTime())
-          // const first = new Date(firstTimestamp - (firstTimestamp % 900000))
-          // const secondTimestamp = this.rnd(2, allDay ? 288 : 8) * 900000
-          // const second = new Date(first.getTime() + secondTimestamp)
-
-          // const start = this.rnd(min.getTime(), max.getTime())
-          let startD = new Date()
-          start = startD.setDate(startD.getDate())
-
-          let endD = new Date()
-          end = endD.setDate(endD.getDate() + 20)
+        for (let i = 0; i < this.activityItem.length; i++) {
+          let activityBasic = this.activityItem[i]['activityBasics']
+          let startD = new Date(activityBasic['apply_sdate'])
+          let endD = new Date(activityBasic['apply_edate'])
 
           events.push({
-            name: this.names[this.rnd(0, this.names.length - 1)],
-            start: start,
-            end: end,
-            color: this.colors[this.rnd(0, this.colors.length - 1)],
+            name: activityBasic['theme'],
+            start: startD.getTime(),
+            end: endD.getTime(),
+            color: 'green lighten-1',
             timed: true,
           })
         }
