@@ -1,186 +1,84 @@
 <template>
   <v-container class="elevation-0">
-      <v-row
-        align="center"
-      >
-        <v-col
-         cols="3"
-        >
-          <v-text-field
+    <DataTable
+      ref="data_table"
+      api_path="/api/activity/ActivityBasic/filter"
+      :searchCondition="searchCondition"
+    >
+      <template v-slot:search>
+          <v-col
+            cols="3"
+          >
+            <v-text-field
               label="主題"
               v-model="searchCondition.q_theme"
-          ></v-text-field>
-        </v-col>
-        <v-col
-          cols="3"
-        >
-          <v-autocomplete
-            :items="items"
-            label="活動類別"
-            v-model="searchCondition.q_activityType"
-          ></v-autocomplete>
-        </v-col>
-
-
-        <v-col
-          cols=""
-        >
-          <v-row
-            justify="end"
-          >
-            <v-col
-              cols="3"
-              align="end"
-            >
-              <v-btn 
-                color="blue lighten-3" 
-                @click.stop="filterSearch"
-              >
-              查詢
-              </v-btn>
-            </v-col>
-            
-            <v-col
-              cols="3"
-              align="end"
-            >
-              <v-btn
-                  @click="advanceSrh"
-              >
-                <v-icon>mdi-magnify</v-icon>
-                進階查詢
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-col>
-    </v-row>
-
-    <v-row v-if="advance_srh" transition="slide-x-transition">
-        <v-col
-          cols="3"
-        >
-          <sdate label="報名日期(起)" :date_time_val.sync="searchCondition.q_apply_sdate"></sdate>
-        </v-col>
-        <v-col
-          cols="3"
-        >
-          <sdate label="報名日期(訖)" :date_time_val.sync="searchCondition.q_apply_edate"></sdate>
-        </v-col>
-        <v-col
-          cols="3"
-        >
-          <sdate label="活動日期(起)" :date_time_val.sync="searchCondition.q_sdate"></sdate>
-        </v-col>
-        <v-col
-          cols="3"
-        >
-          <sdate label="活動日期(訖)" :date_time_val.sync="searchCondition.q_edate"></sdate>
-        </v-col>
-    </v-row>
-
-    <v-data-table
-      ref="data_table"
-      :headers="headers"
-      :items="detail"
-      :loading="tb_loading"
-      :options.sync="options"
-      :server-items-length="totalR"
-      @update:options="getData"
-      :expanded.sync="expanded"
-      show-expand
-      :item-key="item_key"
-    >
-
-    <template v-for="(item, index) in headers" v-slot:[`header.${item.value}`]="{ header }">
-      <div :key="index">
-           <v-switch
-              v-if="header.text == 'openDetail'"
-              @change="open"
-              inset
-              label="展開"
-            ></v-switch>
-        <span v-if="header.text != 'openDetail'" :key="index" class="title">
-            <b>{{ header.text }}</b>
-        </span>
-      </div>
-    </template>
-
-    <template v-for="(item2, index) in headers" v-slot:[`item.${item2.value}`]="{ item }">
-        <v-btn :key="index" v-if="item2.value === 'id'" @click.stop="apply(item.id)" class="green lighten-1 white--text" :loading="btn_apply_loading">
-          我要報名
-        </v-btn>
-        <template v-if="item2.value !== 'id'">
-          {{ trans(item, item2.value) }}
-        </template>
-    </template>
-
-    <template v-slot:expanded-item="{ headers, item }">
-      <td :colspan="headers.length">
-        <v-row>
-          <v-col
-            cols="4"
-          >
-          More info about {{ item.id }}
+            ></v-text-field>
           </v-col>
           <v-col
-            cols="4"
+            cols="3"
           >
-          More info about2 {{ item.theme }}
+            <!-- <v-autocomplete
+              :items="$refs.data_table.ss.activityType"
+              label="活動類別"
+              v-model="searchCondition.q_activityType"
+            ></v-autocomplete> -->
           </v-col>
-        </v-row>
-      </td>
-    </template>
-
-    <template v-slot:[`item.data-table-expand`]="{ isExpanded, expand }">
-      <div>
-        <v-btn icon @click="openById(isExpanded, expand)">
-          <v-icon>
-            {{ isExpanded === true ? 'mdi-lock-open-variant' : 'mdi-lock' }}
-          </v-icon>
-        </v-btn>
-      </div>
-    </template>
-
-    <template
-        v-if="!!this.detail"
-        v-slot:no-data
-      >
-        查無資料
       </template>
-    </v-data-table>
-    {{ options }}
+
+      <template v-slot:advanceSrh>
+        <v-col
+          cols="3"
+        >
+          <DateTimePicker label="報名日期(起)" :date_time_val.sync="searchCondition.q_apply_sdate"></DateTimePicker>
+        </v-col>
+        <v-col
+          cols="3"
+        >
+          <DateTimePicker label="報名日期(訖)" :date_time_val.sync="searchCondition.q_apply_edate"></DateTimePicker>
+        </v-col>
+        <v-col
+          cols="3"
+        >
+          <DateTimePicker label="活動日期(起)" :date_time_val.sync="searchCondition.q_sdate"></DateTimePicker>
+        </v-col>
+        <v-col
+          cols="3"
+        >
+          <DateTimePicker label="活動日期(訖)" :date_time_val.sync="searchCondition.q_edate"></DateTimePicker>
+        </v-col>
+      </template>
+
+      <template v-slot:anotherOp="{ item }">
+        <v-btn icon small title="我要報名" @click.stop="apply(item.id)" class="green lighten-1 white--text">
+          <v-icon>mdi-run-fast</v-icon>
+        </v-btn>
+      </template>
+    </DataTable>
+
+    <Dialog :dialog.sync="dialog" success="報名成功" error="報名失敗" :alert_type="alert_type" :persistent="false"></Dialog>
+    <Confirm :dialog.sync="cancel_dialog" confirm_title="確定報名?" @_confirm:done="dialog_can" :persistent="false"></Confirm>
+    <Overlay :overlay.sync="overlay"></Overlay>
+
   </v-container>
 </template>
 
 <script>
 import DateTimePicker from './_CoreComponents/_DateTimePicker'
+import DataTable from './_CoreComponents/_DataTable.vue'
+import Overlay from './_CoreComponents/_Overlay.vue'
+import Confirm from './_CoreComponents/_Confirm.vue'
+
 export default {
-    async mounted() {
-        console.log('mounted!!!!')
-        await this.getData()
-    },
     components: {
-      sdate: DateTimePicker,
-      // edate: DateTimePicker,
+      DateTimePicker,
+      DataTable,
+      Confirm,
+      Overlay,
     },
-    watch: {
-      // options: {
-      //   handler () {
-      //     this.getData()
-      //   },
-      //   deep: true,
-      // },
-    },
+    watch: {},
     data() {
         return {
-            totalR: 0,
-            options: {},
-            tb_loading: false,
-            advance_srh: false,
-            headers: [],
-            detail: [],
             items: [],
-            q_apply_sdate_show: false,
             searchCondition: {
               q_theme: null,
               q_activityType: null,
@@ -189,100 +87,41 @@ export default {
               q_sdate: null,
               q_edate: null,
             },
-            expanded: [],
-            item_key: 'id',
-            open_detail_icon: 'mdi-lock',
-            btn_apply_loading: false,
+            dialog: false,
+            alert_type: true,
+            overlay: false,
+            item: 0,
+            cancel_dialog: false,
         }
     },
     methods: {
-        openById(isExpanded, expand) {
-          expand(!isExpanded)
+        apply(item) {
+          this.item = item
+          this.cancel_dialog = true
         },
-        open(switch_val) {
-          console.log('VAL', switch_val)
-          this.expanded = []
-
-          if(switch_val) {
-            this.expanded = this.detail
-          }
-        },
-        advanceSrh() {
-          this.advance_srh = !this.advance_srh
-          if(this.advance_srh === false) {
-            this.searchCondition.q_apply_sdate = null
-            this.searchCondition.q_apply_edate = null
-            this.searchCondition.q_sdate = null
-            this.searchCondition.q_edate = null
-          }
-        },
-        filterSearch: function() {
-          let searchCondition = this.searchCondition
-
-          for(let item in searchCondition) {
-              if(searchCondition[item] == null || searchCondition[item] == undefined || searchCondition[item] == '') {
-                  delete searchCondition[item]
-              }
-          }
-          // 查詢後，要重設Page
-          if(Object.keys(searchCondition).length > 0) {
-            this.options = {}
-            this.options = { "page": 1, "itemsPerPage": 10, "sortBy": [], "sortDesc": [], "groupBy": [], "groupDesc": [], "mustSort": false, "multiSort": false }
-          }
-          console.log('condition', searchCondition, Object.keys(searchCondition).length)
-
-          this.getData()
-        },
-        getData: async function() {
-          this.tb_loading = true
-          await this.axios.post(process.env.VUE_APP_API_PATH + '/api/activity/ActivityBasic/filter', 
-            {
-              options: this.options,
-              searchCondition: this.searchCondition,
-            }, 
+        async dialog_can (val) {
+          if(val) {
+            this.overlay = true
+            await this.axios.post(process.env.VUE_APP_API_PATH + '/api/activity/ActivityApply', {
+              activity_id: this.item,
+            },
             {
               headers: {
-                  'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
               }
-            }
-          )
-          .then(response => {
-            console.log(response.data)
-            this.totalR = response.data.meta.total
-            this.headers = response.data.meta.self.headers
-            this.detail = response.data.data
-            this.items = response.data.meta.searchCondition.activityType
-
-          })
-          .catch(err => console.log(err))
-          this.tb_loading = false
-        },
-        trans(obj, keys) {
-          let key = keys.split('.')
-          let tmpObj = obj
-          key.forEach(el => {
-            tmpObj = tmpObj[el]
-          })
-          return tmpObj
-        },
-        async apply(item) {
-          console.log('ITEM', item)
-          this.btn_apply_loading = true
-          await this.axios.post(process.env.VUE_APP_API_PATH + '/api/activity/ActivityApply', {
-            activity_id: item,
-          }, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          })
+            })
             .then(response => {
               console.log('huihihihihih', response)
-            }).catch((err) => {
-              console.log('Vuex setUser ERR', err)
+            }).catch(() => {
+              this.alert_type = false
+            }).finally(() => {
+              this.dialog = true
+              this.overlay = false
+              this.cancel_dialog = false
             })
-          this.filterSearch()
-          this.btn_apply_loading = false
-        }
+            this.$refs.data_table.filterSearch()
+          }
+        },
     }
 }
 </script>
