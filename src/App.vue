@@ -86,6 +86,10 @@
           <v-icon>mdi-account</v-icon>
         </v-btn>
 
+        <v-btn v-if="user ? user.isAdmin : user" icon :plain="true" to="/adminHome">
+          <v-icon>mdi-shield-account</v-icon>
+        </v-btn>
+
       </div>
 
     </v-app-bar>

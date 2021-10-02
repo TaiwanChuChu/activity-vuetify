@@ -86,6 +86,15 @@ export default new VueRouter({
             },
         },
         {
+            path: '/adminHome',
+            name: 'adminHome',
+            component: () => import ("@/components/AdminHome.vue"),
+            meta: {
+                requireAuth: true,
+                isAdmin: true,
+            }
+        },
+        {
             path: '*',
             name: '404',
             component: NotFund,

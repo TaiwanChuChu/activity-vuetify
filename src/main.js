@@ -56,7 +56,7 @@ new Vue({
 }).$mount('#app')
 
 router.beforeEach((to, from, next) => {
-  console.log('beforeEach2', to.meta.requireAuth)
+  console.log('beforeEach2', to.meta.requireAuth, 'isAdmin', to.meta.isAdmin)
 
   if(!(to.meta.requireAuth === true)) {
     return next()
@@ -64,8 +64,14 @@ router.beforeEach((to, from, next) => {
 
   Helper.methods.isLogin().then(status => {
     console.log('SS:',status)
-    if(status) {
+    if (to.meta.isAdmin === true) {
+      if (store.getters.user.isAdmin) {
         return next()
+      }
+    } else {
+      if (status) {
+        return next()
+      }
     }
     return router.push({name: 'login'}).catch(() => {})
   }).catch(() => router.push({name: 'login'}).catch(() => {}))
