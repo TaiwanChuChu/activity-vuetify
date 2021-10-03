@@ -48,7 +48,21 @@
 </template>
 <script>
   export default {
+    async mounted() {
+      console.log('mounted')
+      this.menu_list = await this.axios.get('/api/user/menus')
+      // TODO: 選單呈現
+      let item = this.menu_list.data
+      for(let i = 0; i < this.menu_list.data.length; i++) {
+        this.items[i] = {
+          action: 'mdi-tag',
+          items: [{ title: 'List Item' }],
+          title: item.upper_p_no,
+        }
+      }
+    },
     data: () => ({
+      menu_list: null,
       items: [
         {
           action: 'mdi-ticket',

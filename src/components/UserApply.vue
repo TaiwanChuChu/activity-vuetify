@@ -102,23 +102,14 @@ export default {
         async dialog_can (val) {
           if(val) {
             this.overlay = true
-            await this.axios.post(process.env.VUE_APP_API_PATH + '/api/activity/ActivityApply', {
+            await this.axios.post('/api/activity/ActivityApply', {
               activity_id: this.item,
-            },
-            {
-              headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-              }
-            })
-            .then(response => {
-              console.log('huihihihihih', response)
             }).catch(() => {
               this.alert_type = false
-            }).finally(() => {
-              this.dialog = true
-              this.overlay = false
-              this.cancel_dialog = false
             })
+            this.dialog = true
+            this.overlay = false
+            this.cancel_dialog = false
             this.$refs.data_table.filterSearch()
           }
         },

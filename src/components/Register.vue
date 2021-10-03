@@ -129,7 +129,7 @@ export default {
         }
     },
     methods: {
-        save() {
+        async save() {
             this.dialog = true
             
             if(this.$refs.form.validate()) {
@@ -142,7 +142,7 @@ export default {
 
                 this.overlay = true
                 console.log(process.env.VUE_APP_API_PATH + '/api/user')
-                this.axios.post(process.env.VUE_APP_API_PATH + '/api/user', putJson)
+                await this.axios.post('/api/user', putJson)
                 .then(response => {
                     console.log('AXIOS', response)
                     this.showAlert = true

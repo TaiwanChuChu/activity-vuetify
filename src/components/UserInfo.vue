@@ -122,8 +122,18 @@ export default {
             ],
             files: [],
             FileRules: [
-                v => v.length === 0 || v.size < 2000000 || '檔案大小超過 2MB!',
-                v => v.length === 0 || fileExt.includes(v.type) || `檔案格式只允許${fileExt.join(', ')}!`,
+                v => {
+                    if(v) {
+                        return !v.size || v.size < 2000000 || '檔案大小超過 2MB!'
+                    }
+                    return true
+                },
+                v => {
+                    if(v) {
+                        return !v.length || fileExt.includes(v.type) || `檔案格式只允許${fileExt.join(', ')}!`
+                    }
+                    return true
+                },
             ],
             show: false,
             show2: false,

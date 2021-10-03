@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
+import axios from './core/_axios'
 import router from './router/router'
 
 Vue.use(Vuex)
@@ -23,16 +23,10 @@ const store = new Vuex.Store({
     logOut(state) {
       state.user = null
     },
-    // updateUserName(state, payload) {
-    //   state.user.name = payload
-    // },
-    // updateUserEmail(state, payload) {
-    //   state.user.email = payload
-    // }
   },
   actions: {
     async login({ dispatch }, payload) {
-      let data = await axios.post(process.env.VUE_APP_API_PATH + '/oauth/token', {
+      let data = await axios.post('/oauth/token', {
         grant_type: 'password',
         client_id: `${process.env.VUE_APP_OAUTH_CLIENT_ID}`,
         client_secret: process.env.VUE_APP_OAUTH_SECURITY_KEY,
@@ -41,49 +35,31 @@ const store = new Vuex.Store({
         password: payload.password,
         // password:'password',
         scope: '',
-      })
-        .then(response => {
-          // console.log('login resolve----------------------------------')
-          return response.data.access_token
-        })
-        .catch(err => {
-          console.log(err);
-        })
-      // console.log('data',data)
+      });
 
-      await dispatch('setUser', data)
+      await dispatch('setUser', data.access_token)
     },
 
     async setUser({ commit }, payload) {
       console.log('setUser ------------------------')
 
-      // console.log('PAYLOAD',payload)
       if (payload == null || payload == undefined) {
         return false
       }
-      await axios.get(process.env.VUE_APP_API_PATH + '/api/user', {
+
+      let data = await axios.get('/api/user', {
         headers: {
           'Authorization': `Bearer ${payload}`
         }
-      })
-        .then(async response => {
-          // console.log('setUser ------------------------')
-          response.data.data[0]['access_token'] = payload
-          // console.log('setUser------------------resolve-------------', response)
-          // console.log('huihihihihih', response.data.data)
-          await commit('setUser', response.data.data[0])
-        }).catch((err) => {
-          console.log('Vuex setUser ERR', err)
-        })
+      });
+      data.data[0]['access_token'] = payload
+
+      await commit('setUser', data.data[0])
     },
-    logOut({ commit }, flag) {
+    async logOut({ commit }, flag) {
       console.log('LOGOUT!!!', flag)
       if (flag === false) return
-      axios.post(process.env.VUE_APP_API_PATH + '/api/user/logout', {}, {
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('token'),
-        }
-      });
+      await axios.post('/api/user/logout')
       localStorage.removeItem('token')
       commit('logOut')
       router.push({ name: 'login' }).then().catch(() => { })
@@ -94,7 +70,7 @@ const store = new Vuex.Store({
     },
     // async checkLogin(payload) {
     //   console.log('CHECK LOGIN')
-    //   await axios.get(process.env.VUE_APP_API_PATH + '/api/user', {
+    //   await axios.get('/api/user', {
     //     headers: {
     //       'Authorization': `Bearer ${payload}`
     //     }

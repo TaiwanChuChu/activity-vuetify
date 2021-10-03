@@ -199,24 +199,17 @@ export default {
             console.log('datatable_getData', this.options)
             this.overlay = true
             this.tb_loading = true
-            await this.axios.post(process.env.VUE_APP_API_PATH + this.api_path, 
+            let response = await this.axios.post(this.api_path, 
               {
                 options: this.options,
                 searchCondition: this.searchCondition,
               }, 
-              {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('token'),
-                }
-              }
             )
-            .then(response => {
-              this.totalR = response.data.meta.total
-              this.headers = response.data.meta.self.headers
-              this.detail = response.data.data
-              this.srh_con_item = response.data.meta.searchCondition
-            })
-            .catch(err => console.log(err))
+            this.totalR = response.meta.total
+            this.headers = response.meta.self.headers
+            this.detail = response.data
+            this.srh_con_item = response.meta.searchCondition
+
             this.tb_loading = false
             this.overlay = false
         },

@@ -8,6 +8,7 @@ export default {
                 return true
             }
             return await new Promise(resolve => {
+                console.log('local', localStorage.getItem('token'))
                 let status = store.dispatch('setUser', localStorage.getItem('token')).then(() => {
                     console.log('ISLOGIN RRRR', store.getters.user)
                     if(store.getters.user == null || store.getters.user == undefined) {
