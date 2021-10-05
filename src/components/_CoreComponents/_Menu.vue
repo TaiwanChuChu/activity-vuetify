@@ -30,16 +30,22 @@
       >
         <template v-slot:activator>
           <v-list-item-content>
-            <v-list-item-title v-text="item.title"></v-list-item-title>
+              <v-list-item-title v-text="item.title"></v-list-item-title>
           </v-list-item-content>
         </template>
 
         <v-list-item
           v-for="child in item.items"
           :key="child.title"
+          class="d-flex justify-start red"
         >
-          <v-list-item-content>
-            <v-list-item-title v-text="child.title"></v-list-item-title>
+          <v-list-item-content
+          class="d-flex justify-start red"
+          style="width: 100%;"
+          >
+            <v-btn>
+              <v-list-item-title v-text="child.title"></v-list-item-title>
+            </v-btn>
           </v-list-item-content>
         </v-list-item>
       </v-list-group>
@@ -51,60 +57,37 @@
     async mounted() {
       console.log('mounted')
       this.menu_list = await this.axios.get('/api/user/menus')
-      // TODO: 選單呈現
       let item = this.menu_list.data
-      for(let i = 0; i < this.menu_list.data.length; i++) {
-        this.items[i] = {
-          action: 'mdi-tag',
-          items: [{ title: 'List Item' }],
-          title: item.upper_p_no,
+
+      let data = []
+      let items = []
+      for(let parent in item) {
+        // console.log('parent', item[parent])
+        let _data = item[parent]
+
+        for(let child in item[parent]['children']) {
+          // console.log('children~', item[parent]['children'][child])
+          let _data_child = item[parent]['children'][child]
+          items[child] = {title: _data_child.p_no + ' - ' + _data_child.p_name} 
         }
+
+        data[parent] = {
+          action: _data.mdi_icon,
+          items: items,
+          title: _data.p_name,
+        }
+
+        items = []
       }
+
+      console.log('itemsss', data)
+
+      this.items = data
+
     },
     data: () => ({
       menu_list: null,
-      items: [
-        {
-          action: 'mdi-ticket',
-          items: [{ title: 'List Item' }],
-          title: 'Attractions',
-        },
-        {
-          action: 'mdi-silverware-fork-knife',
-          active: true,
-          items: [
-            { title: 'Breakfast & brunch' },
-            { title: 'New American' },
-            { title: 'Sushi' },
-          ],
-          title: 'Dining',
-        },
-        {
-          action: 'mdi-school',
-          items: [{ title: 'List Item' }],
-          title: 'Education',
-        },
-        {
-          action: 'mdi-run',
-          items: [{ title: 'List Item' }],
-          title: 'Family',
-        },
-        {
-          action: 'mdi-bottle-tonic-plus',
-          items: [{ title: 'List Item' }],
-          title: 'Health',
-        },
-        {
-          action: 'mdi-content-cut',
-          items: [{ title: 'List Item' }],
-          title: 'Office',
-        },
-        {
-          action: 'mdi-tag',
-          items: [{ title: 'List Item' }],
-          title: 'Promotions',
-        },
-      ],
+      items: [],
     }),
   }
 </script>

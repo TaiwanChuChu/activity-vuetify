@@ -9,6 +9,7 @@ import User from "@/components/User";
 import NotFund from "@/components/NotFund";
 import router from '../router/router'
 import Helper from '../helper'
+import AdminHome from '@/components/AdminHome'
 // import store from 'vuex'
 // import store from '../store'
 
@@ -88,7 +89,8 @@ export default new VueRouter({
         {
             path: '/adminHome',
             name: 'adminHome',
-            component: () => import ("@/components/AdminHome.vue"),
+            // component: () => import ("@/components/AdminHome.vue"),
+            component: AdminHome,
             meta: {
                 requireAuth: true,
                 isAdmin: true,

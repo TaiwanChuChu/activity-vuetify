@@ -39,15 +39,21 @@ new Vue({
   router,
   store,
   beforeMount: async function() {
-    console.log('beforeMount')
+    console.log('beforeMount22')
+    console.log(router.history.current.meta)
     if(router.history.current.meta.requireAuth === true) {
       Helper.methods.isLogin().then(async status => {
+      console.log('beforeMount~~', status)
         if(status === false) {
           try {
             return router.push({ name: 'login' })
           } catch (e) { 
             console.log(e)
           }
+        }
+
+        if (router.history.current.meta.isAdmin === true && store.getters.user.isAdmin === false) {
+            return router.push({ name: 'User', params: { userId: store.getters.user.id } })
         }
       })
     }
