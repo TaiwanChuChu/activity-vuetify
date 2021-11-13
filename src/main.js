@@ -39,38 +39,69 @@ new Vue({
   router,
   store,
   beforeMount: async function() {
-    console.log('beforeMount22')
-    console.log(router.history.current.meta)
-    if(router.history.current.meta.requireAuth === true) {
-      Helper.methods.isLogin().then(async status => {
-      console.log('beforeMount~~', status)
-        if(status === false) {
-          try {
-            return router.push({ name: 'login' })
-          } catch (e) { 
-            console.log(e)
+    console.log('beforeMount22', router.history.current.matched)
+    if(router.history.current.matched.length > 0) {
+      
+      let requireAuth = router.history.current.matched[0].meta.requireAuth
+      let isAdmin = router.history.current.matched[0].meta.isAdmin
+
+      router.history.current.matched.some(record => {
+        if(router.history.current.path.toLowerCase() == record.path) {
+
+          let meta = router.history.current.meta
+          if(typeof(meta.meta.requireAuth) !== 'undefined') {
+            requireAuth = meta.requireAuth
+          }
+          if(typeof(meta.meta.isAdmin) !== 'undefined') {
+            isAdmin = meta.isAdmin
           }
         }
-
-        if (router.history.current.meta.isAdmin === true && store.getters.user.isAdmin === false) {
-            return router.push({ name: 'User', params: { userId: store.getters.user.id } })
-        }
       })
+
+      if(requireAuth === true) {
+        Helper.methods.isLogin().then(async status => {
+        console.log('beforeMount~~', status)
+          if(status === false) {
+            try {
+              return router.push({ name: 'login' })
+            } catch (e) { 
+              console.log(e)
+            }
+          }
+
+          if (isAdmin === true && store.getters.user.isAdmin === false) {
+              return router.push({ name: 'User', params: { userId: store.getters.user.id } })
+          }
+        })
+      }
     }
   },
   render: h => h(App),
 }).$mount('#app')
 
 router.beforeEach((to, from, next) => {
-  console.log('beforeEach2', to.meta.requireAuth, 'isAdmin', to.meta.isAdmin)
+  // console.log('beforeEach2', to.meta.requireAuth, 'isAdmin', to.meta.isAdmin)
+  let requireAuth = to.matched[0].meta.requireAuth
+  let isAdmin = to.matched[0].meta.isAdmin
 
-  if(!(to.meta.requireAuth === true)) {
+  to.matched.some(record => {
+    if(to.path.toLowerCase() == record.path) {
+      if(typeof(to.meta.requireAuth) !== 'undefined') {
+        requireAuth = to.meta.requireAuth
+      }
+      if(typeof(to.meta.isAdmin) !== 'undefined') {
+        isAdmin = to.meta.isAdmin
+      }
+    }
+  })
+
+  if(!(requireAuth === true)) {
     return next()
   }
 
   Helper.methods.isLogin().then(status => {
     console.log('SS:',status)
-    if (to.meta.isAdmin === true) {
+    if (isAdmin === true) {
       if (store.getters.user.isAdmin) {
         return next()
       }

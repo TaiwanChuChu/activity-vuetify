@@ -9,7 +9,7 @@ const service = axios.create({
        "Content-Type": "application/json;charset=UTF-8",
     },
     // 配置请求超时时间
-    timeout: 10000,
+    timeout: 0,
 });
 
 // 攔截request
@@ -24,7 +24,6 @@ service.interceptors.request.use(function (config) {
 service.interceptors.response.use((response) => {
     return response.data;
 }, (err) => {
-    console.log('err', err)
     return Promise.reject(err);
 });
 
@@ -36,6 +35,10 @@ export default {
     post: async (api, options = {}, config = {}) => {
         console.log('post', api, options, config)
         return await service.post(api, options, config)
+    },
+    put: async (api, options = {}, config = {}) => {
+        console.log('put', api, options, config)
+        return await service.put(api, options, config)
     },
     delete: async (api, options = {}, config = {}) => {
         console.log('delete', api, options, config)

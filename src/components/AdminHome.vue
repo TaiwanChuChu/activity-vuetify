@@ -1,15 +1,14 @@
 <template>
-    <div class="d-flex">
-        <div class="item">
-            <Menu></Menu>
-        </div>
-        <div class="item">
-            <h1>Admin Home.</h1>
-        </div>
-    </div>
+    <v-app>
+        <Main>
+            <template v-slot:content>
+                <h1>Admin Home.</h1>
+            </template>
+        </Main>
+    </v-app>
 </template>
 <script>
-import Menu from './_CoreComponents/_Menu.vue'
+import Main from '@/components/_Layouts/Main.vue'
 export default {
     data() {
         return {
@@ -17,7 +16,7 @@ export default {
         }
     },
     components: {
-        Menu
+        Main
     }
 }
 </script>

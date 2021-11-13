@@ -1,11 +1,11 @@
 <template>
-    <div>
+    <v-app>
         <Main>
             <template v-slot:content>
-                <h1>404.</h1>
+                <router-view />
             </template>
         </Main>
-    </div>
+    </v-app>
 </template>
 <script>
 import Main from '@/components/_Layouts/Main.vue'

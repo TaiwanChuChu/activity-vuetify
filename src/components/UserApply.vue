@@ -67,6 +67,7 @@ import DateTimePicker from './_CoreComponents/_DateTimePicker'
 import DataTable from './_CoreComponents/_DataTable.vue'
 import Overlay from './_CoreComponents/_Overlay.vue'
 import Confirm from './_CoreComponents/_Confirm.vue'
+import Dialog from './_CoreComponents/_Dialog.vue'
 
 export default {
     components: {
@@ -74,6 +75,7 @@ export default {
       DataTable,
       Confirm,
       Overlay,
+      Dialog,
     },
     watch: {},
     data() {

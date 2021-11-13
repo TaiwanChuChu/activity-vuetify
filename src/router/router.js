@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import HelloWorld from "@/components/HelloWorld";
 import Activity from "@/components/Activity/Activity";
 import Login from "@/components/Login";
 import Register from "@/components/Register";
@@ -10,17 +9,20 @@ import NotFund from "@/components/NotFund";
 import router from '../router/router'
 import Helper from '../helper'
 import AdminHome from '@/components/AdminHome'
-// import store from 'vuex'
-// import store from '../store'
+
+import S01Route from 'Modules/S01/router'
+import A01Route from 'Modules/A01/router'
 
 Vue.use(VueRouter);
 
 export default new VueRouter({
     routes: [
+        S01Route,
+        A01Route,
         {
             path: '/',
             name: 'index',
-            component: HelloWorld,
+            component: () => import(/* webpackChunkName: "HelloWorld" */ "@/components/HelloWorld.vue"),
         },
         {
             path: '/login',

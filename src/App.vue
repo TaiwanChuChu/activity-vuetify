@@ -101,10 +101,10 @@
 </template>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@500&display=swap');
+  /* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@500&display=swap');
   .font-hk {
     font-family: 'Noto Sans HK', sans-serif;
-  }
+  } */
 </style>
 
 <script>

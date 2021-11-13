@@ -79,7 +79,7 @@ export default {
     methods: {
         done(val) {
             this.$emit('_confirm:done', val)
-            this.subDialog = val
+            //this.subDialog = val
         }
     },
     computed: {

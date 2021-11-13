@@ -2,7 +2,7 @@
     <div>
         <Main>
             <template v-slot:content>
-                <h1>404.</h1>
+                <router-view />
             </template>
         </Main>
     </div>
